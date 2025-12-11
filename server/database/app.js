@@ -4,6 +4,7 @@ const fs = require('fs');
 const  cors = require('cors')
 const app = express()
 const port = 3030;
+const Dealership = require('./dealership');
 
 app.use(cors())
 app.use(require('body-parser').urlencoded({ extended: false }));
@@ -58,18 +59,38 @@ app.get('/fetchReviews/dealer/:id', async (req, res) => {
 
 // Express route to fetch all dealerships
 app.get('/fetchDealers', async (req, res) => {
+    try {
+      const dealers = await Dealership.find({});
+      res.json(dealers);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
 //Write your code here
-});
 
 // Express route to fetch Dealers by a particular state
 app.get('/fetchDealers/:state', async (req, res) => {
-//Write your code here
-});
+    try {
+      const dealers = await Dealership.find({ state: req.params.state });
+      res.json(dealers);
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
 
 // Express route to fetch dealer by a particular id
 app.get('/fetchDealer/:id', async (req, res) => {
-//Write your code here
-});
+    try {
+      const dealer = await Dealership.findById(req.params.id);
+      if (dealer) {
+        res.json(dealer);
+      } else {
+        res.status(404).send('Dealer not found');
+      }
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  });
 
 //Express route to insert review
 app.post('/insert_review', express.raw({ type: '*/*' }), async (req, res) => {
