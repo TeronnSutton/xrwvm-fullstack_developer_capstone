@@ -42,7 +42,10 @@ def login_user(request):
     data = {"userName": username}
     if user is not None:
         login(request, user)
-        data = {"userName": username, "status": "Authenticated"}
+        data = {
+            "userName": username,
+            "status": "Authenticated",
+        }
     return JsonResponse(data)
 
 
@@ -78,15 +81,24 @@ def registration(request):
             email=email,
         )
         login(request, user)
-        return JsonResponse({"userName": username, "status": "Authenticated"})
-    return JsonResponse({"userName": username, "error": "Already Registered"})
+        return JsonResponse({
+            "userName": username,
+            "status": "Authenticated",
+        })
+    return JsonResponse({
+        "userName": username,
+        "error": "Already Registered",
+    })
 
 
 def get_dealerships(request, state="All"):
     """Return dealerships, optionally filtered by state."""
     endpoint = "/fetchDealers" if state == "All" else f"/fetchDealers/{state}"
     dealerships = get_request(endpoint)
-    return JsonResponse({"status": 200, "dealers": dealerships})
+    return JsonResponse({
+        "status": 200,
+        "dealers": dealerships,
+    })
 
 
 def get_dealer_reviews(request, dealer_id):
@@ -124,8 +136,14 @@ def get_dealer_details(request, dealer_id):
     if dealer_id:
         endpoint = f"/fetchDealer/{dealer_id}"
         dealership = get_request(endpoint)
-        return JsonResponse({"status": 200, "dealer": dealership})
-    return JsonResponse({"status": 400, "message": "Bad Request"})
+        return JsonResponse({
+            "status": 200,
+            "dealer": dealership,
+        })
+    return JsonResponse({
+        "status": 400,
+        "message": "Bad Request",
+    })
 
 
 @csrf_exempt
@@ -138,4 +156,7 @@ def add_review(request):
         return JsonResponse({"status": 200})
     except Exception as e:
         logger.error("Error posting review: %s", e)
-        return JsonResponse({"status": 401, "message": str(e)})
+        return JsonResponse({
+            "status": 401,
+            "message": str(e),
+        })
