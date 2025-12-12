@@ -1,6 +1,5 @@
 import json
 import logging
-from datetime import datetime
 
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -16,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_cars(request):
+    """Return all cars, populating CarMake/CarModel if empty."""
     if CarMake.objects.count() == 0:
         initiate()
     car_models = CarModel.objects.select_related("car_make")
