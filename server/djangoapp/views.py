@@ -94,17 +94,26 @@ def get_dealerships(request, state="All"):
     return JsonResponse({"status":200,"dealers":dealerships})
 
 def get_dealer_reviews(request, dealer_id):
-    # if dealer id has been provided
-    if(dealer_id):
-        endpoint = "/fetchReviews/dealer/"+str(dealer_id)
+    if dealer_id:
+        endpoint = "/fetchReviews/dealer/" + str(dealer_id)
         reviews = get_request(endpoint)
+
         for review_detail in reviews:
-            response = analyze_review_sentiments(review_detail['review'])
-            print(response)
-            review_detail['sentiment'] = response['sentiment']
-        return JsonResponse({"status":200,"reviews":reviews})
+            try:
+                # ✅ Attempt sentiment analysis
+                response = analyze_review_sentiments(review_detail['review'])
+                review_detail['sentiment'] = response.get('sentiment', 'neutral')
+            except Exception as e:
+                # 🚫 If analyzer fails, log error and set default
+                logger.error(f"Sentiment analysis failed: {e}")
+                review_detail['sentiment'] = "neutral"
+
+        return JsonResponse({"status": 200, "reviews": reviews})
     else:
-        return JsonResponse({"status":400,"message":"Bad Request"})
+        return JsonResponse({"status": 400, "message": "Bad Request"})
+
+
+
 
 def get_dealer_details(request, dealer_id):
     if(dealer_id):
@@ -115,12 +124,11 @@ def get_dealer_details(request, dealer_id):
         return JsonResponse({"status":400,"message":"Bad Request"})
 
 def add_review(request):
-    if(request.user.is_anonymous == False):
+    try:
         data = json.loads(request.body)
-        try:
-            response = post_review(data)
-            return JsonResponse({"status":200})
-        except:
-            return JsonResponse({"status":401,"message":"Error in posting review"})
-    else:
-        return JsonResponse({"status":403,"message":"Unauthorized"})
+        logger.debug(f"Received review data: {data}")
+        response = post_review(data)   # your helper that saves the review
+        return JsonResponse({"status": 200})
+    except Exception as e:
+        logger.error(f"Error posting review: {e}")
+        return JsonResponse({"status": 401, "message": str(e)})
