@@ -160,4 +160,3 @@ def add_review(request):
             "status": 401,
             "message": str(e),
         })
-
