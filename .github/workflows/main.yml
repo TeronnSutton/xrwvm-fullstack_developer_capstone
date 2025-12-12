@@ -41,8 +41,9 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Install JSHint
-        run: npm install jshint --global
+      - name: Install ESLint
+        run: |
+          npm install --global eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y
 
-      - name: Run JSHint
-        run: jshint .
+      - name: Run ESLint
+        run: eslint server/frontend/src --ext .js,.jsx
