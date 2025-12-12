@@ -30,6 +30,7 @@ def get_cars(request):
 
     return JsonResponse({"CarModels": cars})
 
+
 @csrf_exempt
 def login_user(request):
     """Handle user login."""
@@ -116,6 +117,7 @@ def get_dealer_reviews(request, dealer_id):
         "status": 400,
         "message": "Bad Request",
     })
+
 
 def get_dealer_details(request, dealer_id):
     """Return details for a single dealer."""
