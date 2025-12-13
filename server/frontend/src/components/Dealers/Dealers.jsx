@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from "react-router-dom";   // ✅ use Link instead of <a>
+import React, { useState, useEffect, useCallback } from 'react';
 import "./Dealers.css";
 import "../assets/style.css";
 import Header from '../Header/Header';
@@ -10,79 +9,85 @@ const Dealers = () => {
   const [states, setStates] = useState([]);
 
   const dealer_url = "/djangoapp/get_dealers";
+  let dealer_url_by_state = "/djangoapp/get_dealers/";
 
   const filterDealers = async (state) => {
-    const url = `/djangoapp/get_dealers/${state}`;   // ✅ build fresh URL each time
-    const res = await fetch(url, { method: "GET" });
+    dealer_url_by_state = dealer_url_by_state + state;
+    const res = await fetch(dealer_url_by_state, {
+      method: "GET"
+    });
     const retobj = await res.json();
     if (retobj.status === 200) {
-      setDealersList(Array.from(retobj.dealers));
+      let state_dealers = Array.from(retobj.dealers);
+      setDealersList(state_dealers);
     }
   };
 
-  const get_dealers = async () => {
-    const res = await fetch(dealer_url, { method: "GET" });
+  // Wrap the get_dealers function in useCallback to prevent unnecessary re-renders
+  const get_dealers = useCallback(async () => {
+    const res = await fetch(dealer_url, {
+      method: "GET"
+    });
     const retobj = await res.json();
     if (retobj.status === 200) {
-      const all_dealers = Array.from(retobj.dealers);
-      const states = [...new Set(all_dealers.map(dealer => dealer.state))];
-      setStates(states);
+      let all_dealers = Array.from(retobj.dealers);
+      let states = [];
+      all_dealers.forEach((dealer) => {
+        states.push(dealer.state);
+      });
+
+      setStates(Array.from(new Set(states)));
       setDealersList(all_dealers);
     }
-  };
+  }, [dealer_url]);
 
   useEffect(() => {
     get_dealers();
-  }, []);
+  }, [get_dealers]);
 
-  const isLoggedIn = sessionStorage.getItem("username") != null;
+  let isLoggedIn = sessionStorage.getItem("username") != null ? true : false;
 
   return (
     <div>
       <Header />
 
-      <table className="table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Dealer Name</th>
-            <th>City</th>
-            <th>Address</th>
-            <th>Zip</th>
-            <th>
-              <select name="state" id="state" onChange={(e) => filterDealers(e.target.value)}>
-                <option value="" disabled hidden>State</option>
-                <option value="All">All States</option>
-                {states.map(state => (
-                  <option key={state} value={state}>{state}</option>
-                ))}
-              </select>
-            </th>
-            {isLoggedIn && <th>Review Dealer</th>}
+      <table className='table'>
+        <tr>
+          <th>ID</th>
+          <th>Dealer Name</th>
+          <th>City</th>
+          <th>Address</th>
+          <th>Zip</th>
+          <th>
+            <select
+              name="state"
+              id="state"
+              onChange={(e) => filterDealers(e.target.value)}
+            >
+              <option value="" selected disabled hidden>State</option>
+              <option value="All">All States</option>
+              {states.map(state => (
+                <option value={state}>{state}</option>
+              ))}
+            </select>
+          </th>
+          {isLoggedIn ? (
+            <th>Review Dealer</th>
+          ) : <></>}
+        </tr>
+        {dealersList.map(dealer => (
+          <tr key={dealer.id}>
+            <td>{dealer['id']}</td>
+            <td><a href={'/dealer/' + dealer['id']}>{dealer['full_name']}</a></td>
+            <td>{dealer['city']}</td>
+            <td>{dealer['address']}</td>
+            <td>{dealer['zip']}</td>
+            <td>{dealer['state']}</td>
+            {isLoggedIn ? (
+              <td><a href={`/postreview/${dealer['id']}`}><img src={review_icon} className="review_icon" alt="Post Review" /></a></td>
+            ) : <></>}
           </tr>
-        </thead>
-        <tbody>
-          {dealersList.map(dealer => (
-            <tr key={dealer.id}>
-              <td>{dealer.id}</td>
-              <td>
-                {/* ✅ use Link for navigation */}
-                <Link to={`/dealer/${dealer.id}`}>{dealer.full_name}</Link>
-              </td>
-              <td>{dealer.city}</td>
-              <td>{dealer.address}</td>
-              <td>{dealer.zip}</td>
-              <td>{dealer.state}</td>
-              {isLoggedIn && (
-                <td>
-                  <Link to={`/postreview/${dealer.id}`}>
-                    <img src={review_icon} className="review_icon" alt="Post Review" />
-                  </Link>
-                </td>
-              )}
-            </tr>
-          ))}
-        </tbody>
+        ))}
       </table>
     </div>
   );
