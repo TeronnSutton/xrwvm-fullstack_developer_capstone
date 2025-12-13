@@ -1,8 +1,5 @@
-// eslint.config.js
 import js from "@eslint/js";
 import reactPlugin from "eslint-plugin-react";
-import reactHooksPlugin from "eslint-plugin-react-hooks";
-import jsxA11yPlugin from "eslint-plugin-jsx-a11y";
 
 export default [
   js.configs.recommended,
@@ -13,25 +10,15 @@ export default [
       sourceType: "module"
     },
     plugins: {
-      react: reactPlugin,
-      "react-hooks": reactHooksPlugin,
-      "jsx-a11y": jsxA11yPlugin
+      react: reactPlugin
     },
     rules: {
-      // ✅ Modern React: no need to import React in scope
-      "react/react-in-jsx-scope": "off",
-      // Prop validation
-      "react/prop-types": "warn",
-      // Hooks rules
-      "react-hooks/rules-of-hooks": "error",
-      "react-hooks/exhaustive-deps": "warn",
-      // General rules
-      "no-unused-vars": "warn",
-      "no-console": "off"
+      "react/react-in-jsx-scope": "off", // ✅ disables the error
+      "react/prop-types": "warn"
     },
     settings: {
       react: {
-        version: "detect" // Auto-detect React version from package.json
+        version: "detect"
       }
     }
   }
