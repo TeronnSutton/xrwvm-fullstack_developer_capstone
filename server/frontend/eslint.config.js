@@ -18,16 +18,20 @@ export default [
       "jsx-a11y": jsxA11yPlugin
     },
     rules: {
+      // ✅ Modern React: no need to import React in scope
       "react/react-in-jsx-scope": "off",
+      // Prop validation
       "react/prop-types": "warn",
+      // Hooks rules
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
+      // General rules
       "no-unused-vars": "warn",
       "no-console": "off"
     },
     settings: {
       react: {
-        version: "detect"
+        version: "detect" // Auto-detect React version from package.json
       }
     }
   }
