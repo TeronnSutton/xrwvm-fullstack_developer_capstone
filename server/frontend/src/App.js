@@ -1,3 +1,4 @@
+import React from "react";
 import LoginPanel from "./components/Login/Login";
 // make sure this import exists
 import RegisterPanel from "./components/Register/Register";
