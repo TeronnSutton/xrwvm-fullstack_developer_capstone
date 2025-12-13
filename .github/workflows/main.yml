@@ -46,4 +46,4 @@ jobs:
           npm install --global eslint eslint-plugin-react eslint-plugin-react-hooks eslint-plugin-jsx-a11y
 
       - name: Run ESLint
-        run: eslint server/frontend/ --ext .js,.jsx
+        run: eslint server/frontend/eslint.config.js --ext .js,.jsx
